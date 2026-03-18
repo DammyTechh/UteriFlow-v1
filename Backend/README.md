@@ -1,4 +1,4 @@
-# UteriFlow API Backend
+# UteriFlow API Backend by DammyTech
 
 Node.js/Express backend for UteriFlow — authentication, user onboarding, and period tracking, powered by Supabase.
 

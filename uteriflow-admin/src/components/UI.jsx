@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 
-// ── Button ─────────────────────────────────────────────────────────────
 export function Btn({ children, variant='primary', size='md', loading, className='', style: styleProp={}, ...props }) {
   const base = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -30,7 +29,6 @@ export function Btn({ children, variant='primary', size='md', loading, className
   )
 }
 
-// ── Input ──────────────────────────────────────────────────────────────
 export function Input({ label, icon: Icon, error, className='', ...props }) {
   return (
     <div style={{ marginBottom: '18px' }}>
@@ -55,7 +53,6 @@ export function Input({ label, icon: Icon, error, className='', ...props }) {
   )
 }
 
-// ── Card ───────────────────────────────────────────────────────────────
 export function Card({ children, style={}, className='', ...props }) {
   return (
     <div style={{ background:'white', borderRadius:'var(--radius)', boxShadow:'var(--shadow-sm)', ...style }} {...props}>
@@ -64,7 +61,6 @@ export function Card({ children, style={}, className='', ...props }) {
   )
 }
 
-// ── Badge ──────────────────────────────────────────────────────────────
 export function Badge({ children, color='purple' }) {
   const colors = {
     purple: { bg:'var(--purple-pale)', color:'var(--purple)' },
@@ -85,7 +81,6 @@ export function Badge({ children, color='purple' }) {
   )
 }
 
-// ── Avatar ─────────────────────────────────────────────────────────────
 export function Avatar({ name, email, size=32 }) {
   const str = name || email || '?'
   const initials = str.slice(0, 2).toUpperCase()
@@ -103,7 +98,6 @@ export function Avatar({ name, email, size=32 }) {
   )
 }
 
-// ── Modal ──────────────────────────────────────────────────────────────
 export function Modal({ open, onClose, children }) {
   if (!open) return null
   return (
@@ -126,7 +120,6 @@ export function Modal({ open, onClose, children }) {
   )
 }
 
-// ── Confirm Modal ──────────────────────────────────────────────────────
 export function ConfirmModal({ open, onClose, onConfirm, title, description, icon='🗑️', confirmLabel='Confirm', danger=true, loading }) {
   return (
     <Modal open={open} onClose={onClose}>
@@ -143,7 +136,6 @@ export function ConfirmModal({ open, onClose, onConfirm, title, description, ico
   )
 }
 
-// ── Spinner ────────────────────────────────────────────────────────────
 export function Spinner({ size=28 }) {
   return (
     <div style={{
@@ -156,7 +148,6 @@ export function Spinner({ size=28 }) {
   )
 }
 
-// ── Empty state ────────────────────────────────────────────────────────
 export function Empty({ icon='💬', message='Nothing here yet' }) {
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', padding:'56px 20px', gap:'12px', color:'var(--gray-400)' }}>
@@ -166,7 +157,6 @@ export function Empty({ icon='💬', message='Nothing here yet' }) {
   )
 }
 
-// ── Dropdown ───────────────────────────────────────────────────────────
 export function Dropdown({ trigger, items }) {
   const [open, setOpen] = useState(false)
   return (
@@ -206,7 +196,6 @@ export function Dropdown({ trigger, items }) {
   )
 }
 
-// ── Tabs ────────────────────────────────────────────────────────────────
 export function Tabs({ tabs, active, onChange }) {
   return (
     <div style={{
@@ -232,7 +221,6 @@ export function Tabs({ tabs, active, onChange }) {
   )
 }
 
-// ── Search input ────────────────────────────────────────────────────────
 export function SearchInput({ value, onChange, placeholder='Search...' }) {
   return (
     <div style={{ position:'relative', flex:1 }}>
@@ -255,7 +243,6 @@ export function SearchInput({ value, onChange, placeholder='Search...' }) {
   )
 }
 
-// ── Page header ─────────────────────────────────────────────────────────
 export function PageHeader({ title, subtitle }) {
   return (
     <div style={{ marginBottom:'28px' }}>

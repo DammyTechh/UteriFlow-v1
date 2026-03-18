@@ -300,7 +300,7 @@
  * @swagger
  * /auth/password/forgot:
  *   post:
- *     summary: "Send 6-digit reset code to email"
+ *     summary: "Step 1 of 3 — Send 6-digit reset code to email"
  *     description: >
  *       Sends a 6-digit password reset code to the user's email via Resend SMTP.
  *       Always returns the same response whether or not the email exists (prevents enumeration).
@@ -337,7 +337,7 @@
  * @swagger
  * /auth/password/verify-code:
  *   post:
- *     summary: "Verify the 6-digit reset code"
+ *     summary: "Step 2 of 3 — Verify the 6-digit reset code"
  *     description: >
  *       Verifies the 6-digit code sent to the user's email. Max 5 attempts before lockout.
  *       On success, returns a resetToken that must be passed to /auth/password/reset.
@@ -388,7 +388,7 @@
  * @swagger
  * /auth/password/reset:
  *   post:
- *     summary: "Set new password"
+ *     summary: "Step 3 of 3 — Set new password"
  *     description: >
  *       Sets a new password using the resetToken obtained from /auth/password/verify-code.
  *       Requires password and confirmPassword to match.

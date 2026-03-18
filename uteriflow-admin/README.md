@@ -1,4 +1,4 @@
-# UteriFlow Admin — React Web App
+# UteriFlow Admin — React Web App by DammyTech
 
 Admin dashboard for the UteriFlow platform. Built with **React 18 + Vite + React Router**.
 

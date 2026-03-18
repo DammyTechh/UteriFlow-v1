@@ -1,19 +1,43 @@
 import { createClient } from '@supabase/supabase-js';
 
-const { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY } = process.env;
+const getUrl  = () => process.env.SUPABASE_URL;
+const getAnon = () => process.env.SUPABASE_ANON_KEY;
+const getSvc  = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  throw new Error('Missing required env vars: SUPABASE_URL, SUPABASE_ANON_KEY');
-}
+let _supabase      = null;
+let _supabaseAdmin = null;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { autoRefreshToken: true, persistSession: false, detectSessionInUrl: false },
-});
+export const getSupabase = () => {
+  if (!_supabase) {
+    _supabase = createClient(getUrl(), getAnon(), {
+      auth: { autoRefreshToken: true, persistSession: false, detectSessionInUrl: false },
+    });
+  }
+  return _supabase;
+};
 
-export const supabaseAdmin = SUPABASE_SERVICE_ROLE_KEY
-  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+export const getSupabaseAdmin = () => {
+  if (!_supabaseAdmin) {
+    const svc = getSvc();
+    if (!svc) return null;
+    _supabaseAdmin = createClient(getUrl(), svc, {
       auth: { autoRefreshToken: false, persistSession: false },
-    })
-  : null;
+    });
+  }
+  return _supabaseAdmin;
+};
 
-export default supabase;
+export default { 
+  get auth()           { return getSupabase().auth; },
+  from(table)          { return getSupabase().from(table); },
+};
+
+export const supabaseAdmin = {
+  get auth()           { return getSupabaseAdmin()?.auth; },
+  from(table)          { return getSupabaseAdmin()?.from(table); },
+};
+
+export const supabase = {
+  get auth()           { return getSupabase().auth; },
+  from(table)          { return getSupabase().from(table); },
+};

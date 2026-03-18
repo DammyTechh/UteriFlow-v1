@@ -1,19 +1,9 @@
-import { supabaseAdmin } from '../config/supabase.js';
+import { supabaseAdmin, getSupabaseAdmin } from '../config/supabase.js';
 import { AppError } from '../errors/index.js';
 
-/**
- * Middleware: verifies the request has a valid Bearer token AND
- * that the resolved user has the `is_admin = true` flag set in
- * their user_metadata (stored in Supabase Auth).
- *
- * To grant a user admin rights run this in your Supabase SQL editor:
- *   UPDATE auth.users
- *   SET raw_user_meta_data = raw_user_meta_data || '{"is_admin": true}'
- *   WHERE email = 'admin@example.com';
- */
 export async function requireAdmin(req, res, next) {
   try {
-    if (!supabaseAdmin) {
+    if (!getSupabaseAdmin()) {
       return next(
         new AppError(
           'Admin features require SUPABASE_SERVICE_ROLE_KEY to be set.',

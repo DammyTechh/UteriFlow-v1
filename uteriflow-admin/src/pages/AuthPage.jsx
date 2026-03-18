@@ -44,7 +44,6 @@ function EmailInput({ label, value, onChange, placeholder }) {
   )
 }
 
-/* Logo — purple version for white background */
 function Logo() {
   return (
     <div style={{ display:'flex', justifyContent:'center', marginBottom:'28px' }}>
@@ -53,7 +52,6 @@ function Logo() {
   )
 }
 
-/* Left panel — brand + dazzle illustration */
 function AuthLeft() {
   const [imgFailed, setImgFailed] = useState(false)
 
@@ -97,7 +95,6 @@ function AuthLeft() {
             onError={() => setImgFailed(true)}
           />
         ) : (
-          /* fallback SVG if image not found */
           <div style={{ background:'rgba(255,255,255,0.08)', borderRadius:'16px', padding:'28px', display:'flex', alignItems:'center', justifyContent:'center' }}>
             <svg viewBox="0 0 260 180" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width:'200px' }}>
               <rect x="18" y="18" width="224" height="144" rx="12" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5"/>
@@ -121,7 +118,7 @@ function AuthLeft() {
 }
 
 export default function AuthPage() {
-  const { login, saveToken } = useAuth()
+  const { login, saveSession } = useAuth()
   const nav = useNavigate()
 
   const [screen, setScreen]   = useState('login')
@@ -165,7 +162,7 @@ export default function AuthPage() {
     try {
       await api.verifyOTP({ email: signupEmail, code: otpCode })
       const data = await api.createPassword({ email: signupEmail, password: signupPass })
-      if (data.session) { saveToken(data.session.accessToken); toast.success('Account created!'); nav('/analytics') }
+      if (data.session) { saveSession(data.session.accessToken, data.session.refreshToken, data.session.expiresAt); toast.success('Account created!'); nav('/analytics') }
       else { toast.success('Account created! Login once admin access is granted.'); setScreen('login') }
     } catch (err) { toast.error(err.message || 'Verification failed') }
     finally { setLoading(false) }

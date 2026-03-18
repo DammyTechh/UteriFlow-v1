@@ -1,34 +1,92 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import api from '../api'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser]       = useState(null)
-  const [token, setToken]     = useState(() => localStorage.getItem('uf_token'))
-  const [loading, setLoading] = useState(false)
+  const [user, setUser]     = useState(null)
+  const [token, setToken]   = useState(() => localStorage.getItem('uf_token'))
+  const [loading, setLoading] = useState(true) // start true — check stored token first
+  const refreshTimer        = useRef(null)
 
-  const saveToken = (t) => {
-    setToken(t)
-    localStorage.setItem('uf_token', t)
+  const saveSession = (accessToken, refreshToken, expiresAt) => {
+    setToken(accessToken)
+    localStorage.setItem('uf_token',         accessToken)
+    localStorage.setItem('uf_refresh_token', refreshToken || '')
+    localStorage.setItem('uf_expires_at',    expiresAt   || '')
   }
+
+  const clearSession = () => {
+    setToken(null)
+    setUser(null)
+    localStorage.removeItem('uf_token')
+    localStorage.removeItem('uf_refresh_token')
+    localStorage.removeItem('uf_expires_at')
+    if (refreshTimer.current) clearTimeout(refreshTimer.current)
+  }
+
+  const scheduleRefresh = (expiresAt) => {
+    if (refreshTimer.current) clearTimeout(refreshTimer.current)
+    if (!expiresAt) return
+
+    const expiresMs  = Number(expiresAt) * 1000       
+    const nowMs      = Date.now()
+    const refreshIn  = expiresMs - nowMs - 2 * 60 * 1000  
+
+    if (refreshIn <= 0) {
+      doRefresh()
+      return
+    }
+
+    refreshTimer.current = setTimeout(doRefresh, refreshIn)
+  }
+
+  const doRefresh = async () => {
+    const refreshToken = localStorage.getItem('uf_refresh_token')
+    if (!refreshToken) { clearSession(); return }
+
+    try {
+      const data = await api.refreshToken(refreshToken)
+      const s = data.session
+      saveSession(s.accessToken, s.refreshToken, s.expiresAt)
+      scheduleRefresh(s.expiresAt)
+    } catch {
+      clearSession()
+    }
+  }
+
+  useEffect(() => {
+    const storedToken   = localStorage.getItem('uf_token')
+    const expiresAt     = localStorage.getItem('uf_expires_at')
+
+    if (!storedToken) { setLoading(false); return }
+
+    if (expiresAt && Number(expiresAt) * 1000 < Date.now()) {
+      doRefresh().finally(() => setLoading(false))
+    } else {
+      scheduleRefresh(expiresAt)
+      setLoading(false)
+    }
+
+    return () => { if (refreshTimer.current) clearTimeout(refreshTimer.current) }
+  }, [])
 
   const login = async (email, password) => {
     const data = await api.login({ email, password })
-    saveToken(data.session.accessToken)
+    const s = data.session
+    saveSession(s.accessToken, s.refreshToken, s.expiresAt)
     setUser(data.user)
+    scheduleRefresh(s.expiresAt)
     return data
   }
 
   const logout = async () => {
     try { await api.logout() } catch {}
-    setToken(null)
-    setUser(null)
-    localStorage.removeItem('uf_token')
+    clearSession()
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, saveToken, setUser }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout, saveSession, setUser }}>
       {children}
     </AuthContext.Provider>
   )

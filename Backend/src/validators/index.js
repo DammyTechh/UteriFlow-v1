@@ -18,7 +18,6 @@ export const authValidators = {
       .matches(/[a-zA-Z]/).withMessage('Password must contain at least one letter'),
   ],
 
-  
   verifyResetCode: [
     body('email').isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage('A valid email address is required'),
     body('code').isLength({ min: 6, max: 6 }).isNumeric().withMessage('Reset code must be exactly 6 digits'),

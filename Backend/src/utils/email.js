@@ -9,6 +9,7 @@ const createTransporter = () => {
   const pass = (process.env.SMTP_PASS || '').trim();
 
   if (!host || !user || !pass) {
+  
     console.warn(
       '[Email] SMTP not configured — printing to console instead.\n' +
       `  SMTP_HOST="${host}" SMTP_USER="${user}" SMTP_PASS="${pass ? '***set***' : 'MISSING'}"`
@@ -23,7 +24,7 @@ const createTransporter = () => {
     auth: { user, pass },
     
     tls: { rejectUnauthorized: false },
-    
+   
     connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 15000,
@@ -35,6 +36,7 @@ const getFrom = () => {
   const email = (process.env.SMTP_FROM_EMAIL || 'onboarding@resend.dev').trim();
   return `"${name}" <${email}>`;
 };
+
 
 const sendMail = async ({ to, subject, text, html, throwOnFail = true }) => {
   const transporter = createTransporter();
@@ -60,7 +62,7 @@ const sendMail = async ({ to, subject, text, html, throwOnFail = true }) => {
         'EMAIL_SEND_FAILED'
       );
     }
-    
+   
   }
 };
 
@@ -211,7 +213,7 @@ export const sendOnboardingCompleteEmail = async (to, displayName) => {
   const name = displayName || 'there';
   await sendMail({
     to,
-    subject: 'Your UteriFlow profile is complete 🎉',
+    subject: 'Your UteriFlow profile is complete ',
     text: `Hi ${name},\n\nYou've completed your UteriFlow profile! You're all set to start tracking your cycle.\n\nThe UteriFlow Team`,
     html: emailLayout('Profile Complete', `
       <h2 style="margin:0 0 8px;font-size:18px;font-weight:600;color:#111827;text-align:center;">Your profile is complete! 🎉</h2>

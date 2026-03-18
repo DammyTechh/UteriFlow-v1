@@ -21,9 +21,8 @@ const getAuthedClient = (accessToken) => {
   });
 };
 
-
 const withPurpose = (query, purpose) => {
-  
+
   return query.eq('purpose', purpose);
 };
 
@@ -39,7 +38,6 @@ router.post('/email/check', authValidators.email, validate, async (req, res, nex
     return res.json({ exists: data !== null, flow: data ? 'login' : 'register' });
   } catch (error) { next(error); }
 });
-
 
 router.post('/email/send-otp', authValidators.email, validate, async (req, res, next) => {
   try {
@@ -62,7 +60,6 @@ router.post('/email/send-otp', authValidators.email, validate, async (req, res, 
     return res.json({ message: 'Verification code sent to your email', verificationId: verification.id });
   } catch (error) { next(error); }
 });
-
 
 router.post('/email/verify', authValidators.verifyOtp, validate, async (req, res, next) => {
   try {
@@ -92,7 +89,6 @@ router.post('/email/verify', authValidators.verifyOtp, validate, async (req, res
     return res.json({ message: 'Email verified successfully', verified: true, email });
   } catch (error) { next(error); }
 });
-
 
 router.post('/email/resend', authValidators.email, validate, async (req, res, next) => {
   try {
@@ -228,6 +224,7 @@ router.post('/password/forgot', authValidators.email, validate, async (req, res,
     const { data: profile } = await supabase.from('user_profiles').select('email').eq('email', email).maybeSingle();
 
     if (profile) {
+     
       await supabase.from('email_verifications').update({ attempts: 99 }).eq('email', email).eq('verified', false);
 
       const otpCode = generateOTP();
@@ -243,7 +240,6 @@ router.post('/password/forgot', authValidators.email, validate, async (req, res,
     return res.json({ message: 'If an account with this email exists, a 6-digit reset code has been sent to your email.' });
   } catch (error) { next(error); }
 });
-
 
 router.post('/password/verify-code', authValidators.verifyResetCode, validate, async (req, res, next) => {
   try {
@@ -269,7 +265,6 @@ router.post('/password/verify-code', authValidators.verifyResetCode, validate, a
       throw new ValidationError(remaining > 0 ? `Invalid reset code. ${remaining} attempt(s) remaining.` : 'No attempts remaining. Please request a new code.');
     }
 
-    // Mark verified so it can be used as a resetToken
     await supabase.from('email_verifications').update({ verified: true }).eq('id', verification.id);
 
     return res.json({
@@ -280,11 +275,10 @@ router.post('/password/verify-code', authValidators.verifyResetCode, validate, a
   } catch (error) { next(error); }
 });
 
-// ─── STEP 3: Reset password — new password + confirm password ────────────────
 router.post('/password/reset', authValidators.resetPassword, validate, async (req, res, next) => {
   try {
     const { resetToken, password } = req.body;
-    // confirmPassword match is enforced by the validator
+   
 
     const { data: verification, error: fetchError } = await supabase
       .from('email_verifications')
@@ -308,7 +302,6 @@ router.post('/password/reset', authValidators.resetPassword, validate, async (re
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(authUser.id, { password });
     if (updateError) throw updateError;
 
-    // Burn token — expire it so it can never be reused
     await supabase.from('email_verifications').update({ expires_at: new Date().toISOString() }).eq('id', resetToken);
 
     sendPasswordChangedEmail(verification.email).catch((e) => console.error('[Email] Password changed email failed:', e.message));

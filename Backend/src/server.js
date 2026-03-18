@@ -11,12 +11,12 @@ import authRoutes from './routes/auth.js';
 import onboardingRoutes from './routes/onboarding.js';
 import periodRoutes from './routes/period.js';
 import adminRoutes from './routes/admin.js';
+import communityRoutes from './routes/community.js';
 import { AppError } from './errors/index.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
-
 
 app.use(helmet());
 app.use(cors({
@@ -27,6 +27,7 @@ app.use(cors({
 
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
 
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, max: 200,
@@ -61,10 +62,9 @@ app.use('/api/v1/auth', authLimiter, authRoutes);
 app.use('/api/v1/onboarding', onboardingRoutes);
 app.use('/api/v1/period', periodRoutes);
 app.use('/api/v1/admin', adminRoutes);
-
+app.use('/api/v1/admin', communityRoutes);
 
 app.use((req, res) => res.status(404).json({ error: `Route ${req.method} ${req.path} not found`, code: 'NOT_FOUND' }));
-
 
 app.use((err, req, res, next) => {
   if (err instanceof AppError) {
@@ -83,6 +83,13 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, async () => {
+ 
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('\n WARNING: SUPABASE_SERVICE_ROLE_KEY is not set in .env');
+    console.error('   All /admin/* routes will return 503 until this is added.\n');
+  } else {
+    console.log('[Supabase]  Service role key loaded — admin routes active');
+  }
   console.log(`\nUteriFlow API running — port ${PORT} [${NODE_ENV}]`);
   console.log(`Swagger docs: http://localhost:${PORT}/api-docs`);
   console.log(`Health:       http://localhost:${PORT}/health\n`);
@@ -105,11 +112,11 @@ app.listen(PORT, async () => {
       await transporter.verify();
       console.log(`[SMTP] Connected to ${smtpHost} — emails will be sent via Resend\n`);
     } catch (err) {
-      console.error(`[SMTP] Connection FAILED: ${err.message}`);
+      console.error(`[SMTP]  Connection FAILED: ${err.message}`);
       console.error(`[SMTP]    Emails will fall back to console output until resolved.\n`);
     }
   } else {
-    console.warn('[SMTP] No SMTP config — emails will print to console only.\n');
+    console.warn('[SMTP]   No SMTP config — emails will print to console only.\n');
   }
 });
 

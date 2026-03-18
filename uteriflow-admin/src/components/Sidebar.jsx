@@ -9,7 +9,6 @@ const NAV = [
   { to: '/settings',  icon: Settings,  label: 'Settings' },
 ]
 
-/* White drop SVG — used everywhere as the brand icon */
 const DropIcon = ({ size = 20 }) => (
   <svg width={size} height={Math.round(size * 1.27)} viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M11 2C11 2 2 12.5 2 18C2 22.4 6.1 26 11 26C15.9 26 20 22.4 20 18C20 12.5 11 2 11 2Z" fill="white"/>

@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.use(requireAdmin);
 
+
 const paginationValidators = [
   query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
   query('offset').optional().isInt({ min: 0 }).toInt(),
@@ -18,7 +19,6 @@ const uuidParam = [param('id').isUUID().withMessage('Invalid ID')];
 
 router.get('/stats', async (req, res, next) => {
   try {
-  
     const { count: totalUsers, error: usersError } = await supabaseAdmin
       .from('user_profiles')
       .select('*', { count: 'exact', head: true });
@@ -83,6 +83,7 @@ router.get('/stats', async (req, res, next) => {
   }
 });
 
+
 router.get(
   '/users',
   [
@@ -124,6 +125,7 @@ router.get(
   }
 );
 
+
 router.get('/users/:id', uuidParam, validate, async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -137,6 +139,7 @@ router.get('/users/:id', uuidParam, validate, async (req, res, next) => {
     if (profileError) throw profileError;
     if (!profile) throw new NotFoundError('User not found');
 
+    
     const { count: periodCount, error: countError } = await supabaseAdmin
       .from('period_logs')
       .select('*', { count: 'exact', head: true })
@@ -205,6 +208,7 @@ router.patch(
   }
 );
 
+
 router.delete('/users/:id', uuidParam, validate, async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -266,6 +270,7 @@ router.get(
   }
 );
 
+
 router.delete('/period-logs/:id', uuidParam, validate, async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -302,7 +307,6 @@ router.post('/users/:id/grant-admin', uuidParam, validate, async (req, res, next
     next(error);
   }
 });
-
 
 router.post('/users/:id/revoke-admin', uuidParam, validate, async (req, res, next) => {
   try {
