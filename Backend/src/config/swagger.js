@@ -5,28 +5,32 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = dirname(__filename);
 
+const getServers = () => {
+  const servers = [];
+  if (process.env.RENDER_EXTERNAL_URL) {
+    servers.push({ url: `${process.env.RENDER_EXTERNAL_URL}/api/v1`, description: 'Production (Render)' });
+  }
+  servers.push({ url: 'http://localhost:3000/api/v1', description: 'Local development' });
+  return servers;
+};
+
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
       title: 'UteriFlow API',
       version: '1.0.0',
-      description:
-        'Authentication, onboarding, and period tracking API for UteriFlow — powered by Supabase.',
+      description: 'Authentication, onboarding, and period tracking API for UteriFlow — powered by Supabase.',
       contact: { name: 'UteriFlow Team' },
     },
-    servers: [
-      { url: 'https://uteri-flow-v1.onrender.com/api/v1', description: 'Production' },
-      { url: 'http://localhost:3000/api/v1', description: 'Development' },
-    ],
+    servers: getServers(),
     components: {
       securitySchemes: {
         bearerAuth: {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description:
-            'JWT access token from Supabase. Obtain via POST /auth/login or POST /auth/password/create.',
+          description: 'JWT access token from Supabase. Obtain via POST /auth/login or POST /auth/password/create.',
         },
       },
       schemas: {
