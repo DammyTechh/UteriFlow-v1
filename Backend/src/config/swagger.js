@@ -1,4 +1,9 @@
 import swaggerJsdoc from 'swagger-jsdoc';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = dirname(__filename);
 
 const options = {
   definition: {
@@ -12,7 +17,7 @@ const options = {
     },
     servers: [
       { url: 'http://localhost:3000/api/v1', description: 'Development' },
-      { url: 'https://domain.com/api/v1', description: 'Production' },
+      { url: 'https://your-domain.com/api/v1', description: 'Production' },
     ],
     components: {
       securitySchemes: {
@@ -121,7 +126,7 @@ const options = {
       { name: 'Admin', description: 'Admin-only: user management, stats, period log oversight' },
     ],
   },
-  apis: ['./src/docs/*.js'],
+  apis: [join(__dirname, '../docs/*.js')],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
