@@ -67,7 +67,9 @@ app.get('/api-docs/spec.json', (req, res) => {
 });
 
 app.get('/api-docs', (req, res) => {
-  const specUrl = `${req.protocol}://${req.get('host')}/api-docs/spec.json`;
+  // Force https on Vercel — req.protocol is 'http' behind Vercel's proxy
+  const proto = process.env.VERCEL ? 'https' : req.protocol;
+  const specUrl = `${proto}://${req.get('host')}/api-docs/spec.json`;
   res.redirect(`https://petstore.swagger.io/?url=${encodeURIComponent(specUrl)}`);
 });
 
