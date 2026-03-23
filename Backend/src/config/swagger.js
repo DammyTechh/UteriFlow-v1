@@ -16,8 +16,8 @@ const options = {
       contact: { name: 'UteriFlow Team' },
     },
     servers: [
+      { url: 'https://uteri-flow-v1.onrender.com/api/v1', description: 'Production' },
       { url: 'http://localhost:3000/api/v1', description: 'Development' },
-      { url: 'https://your-domain.com/api/v1', description: 'Production' },
     ],
     components: {
       securitySchemes: {
