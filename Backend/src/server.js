@@ -126,7 +126,7 @@ app.listen(PORT, async () => {
     } else {
       console.warn('[SMTP] ⚠️  No SMTP config — emails will print to console only.\n');
     }
-  });
-}
+});
+
 
 export default app;
