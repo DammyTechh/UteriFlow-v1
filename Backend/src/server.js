@@ -57,30 +57,11 @@ app.get('/', (req, res) => res.json({ name: "UteriFlow API", version: '1.0.0', d
 app.get('/health', (req, res) => res.json({ status: 'healthy', timestamp: new Date().toISOString(), env: NODE_ENV }));
 
 // ─── Swagger docs ─────────────────────────────────────────────────────────────
-// swagger-ui-express static assets break on Vercel serverless
-// Serve raw JSON spec + redirect to swagger.io online viewer
-
-app.get('/api-docs/spec.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.json(swaggerSpec);
-});
-
-app.get('/api-docs', (req, res) => {
-  // Force https on Vercel — req.protocol is 'http' behind Vercel's proxy
-  const proto = process.env.VERCEL ? 'https' : req.protocol;
-  const specUrl = `${proto}://${req.get('host')}/api-docs/spec.json`;
-  res.redirect(`https://petstore.swagger.io/?url=${encodeURIComponent(specUrl)}`);
-});
-
-// Full Swagger UI only on local dev
-if (!process.env.VERCEL) {
-  app.use('/api-docs/ui', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'UteriFlow API Docs',
-    swaggerOptions: { persistAuthorization: true },
-  }));
-}
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'UteriFlow API Docs',
+  swaggerOptions: { persistAuthorization: true },
+}));
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/v1/auth', authLimiter, authRoutes);
@@ -110,9 +91,7 @@ app.use((err, req, res, next) => {
 });
 
 // ─── Start ────────────────────────────────────────────────────────────────────
-// On Vercel (serverless) skip app.listen — just export the app
-if (!process.env.VERCEL) {
-  app.listen(PORT, async () => {
+app.listen(PORT, async () => {
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error('\n⚠️  WARNING: SUPABASE_SERVICE_ROLE_KEY is not set in .env');
       console.error('   All /admin/* routes will return 503 until this is added.\n');
